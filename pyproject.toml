@@ -1,0 +1,7 @@
+[project]
+name = "napari-oblique-slice"
+version = "0.0.1"
+dependencies = [
+    "napari"
+]
+
