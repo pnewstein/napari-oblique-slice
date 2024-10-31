@@ -11,6 +11,7 @@ from napari.layers.utils.plane import (
     ClippingPlaneList,
 )
 from napari.qt.threading import thread_worker, GeneratorWorker
+from scipy.spatial.transform import Rotation as R
 
 from qtpy.QtWidgets import (  # pylint: disable=no-name-in-module
     QSlider,
@@ -76,7 +77,7 @@ def get_slider_lookup_table(normal: Point3D, shape: tuple) -> NDArray:
     cosines = [(np.dot(normal, vector)) for vector in DIAGONAL_VECTORS]
     abs_cosines = np.abs(cosines)
     index = np.argmax(abs_cosines)
-    corners = DIAGONALS[index] * shape
+    corners = DIAGONALS[index] * shape[-3:]
     if cosines[index] > 0:
         return np.linspace(corners[0], corners[1], N_PLANE_TICKS)
     else:
@@ -220,9 +221,7 @@ class ObliqueSlice(QWidget):  # type: ignore
             print("no layers to orient")
             return
         layer = layers[0]
-        n1, n2, n3 = layer._world_to_displayed_data_ray(
-            self.viewer.camera.view_direction, [-3, -2, -1]
-        )
+        n1, n2, n3 = np.array(self.viewer.camera.view_direction) * layer.scale[-3:]
         out_plane = layer.plane.copy()
         out_plane.normal = (n1, n2, n3)
         self.slider_lookup_table = get_slider_lookup_table(
@@ -231,4 +230,5 @@ class ObliqueSlice(QWidget):  # type: ignore
         self.slicing_plane = out_plane
         self.update_slice(self.slicer.value())
         self.plane_angle = self.viewer.camera.angles[1:]
+
 
