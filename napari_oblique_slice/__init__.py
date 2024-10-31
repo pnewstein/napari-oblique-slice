@@ -142,6 +142,7 @@ class ObliqueSlice(QWidget):  # type: ignore
         )
         self.update_angle_slider(None, angles=self.viewer.camera.angles)
         self.async_clip_worker: GeneratorWorker | None = None
+        self.orient_plane_normal_along_view_direction()
 
     def init_gui(self) -> tuple[QSlider, QPushButton, QSlider, QPushButton]:
         # get widgets
